@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Zakat Islam - Muhammad Ali Ridho (IAIN Pontianak)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for breakdown visualizer -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+            .shadow-xl, .shadow-md, .shadow-lg { box-shadow: none !important; }
+            .border { border-color: #cbd5e1 !important; }
+        }
+        .print-only { display: none; }
+        /* Custom scrollbar for table containers */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white shadow-lg sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
+                        <i class="fa-solid font-bold text-2xl text-amber-400 fa-kaaba"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight leading-none text-white">Kalkulator Zakat Islam</h1>
+                        <p class="text-xs text-emerald-200 mt-1 font-medium">Disusun oleh: <span class="text-amber-300 font-semibold">Muhammad Ali Ridho</span> &bull; IAIN Pontianak</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Quick Links -->
+                <nav class="hidden md:flex items-center gap-1 text-sm font-medium">
+                    <button onclick="scrollToSection('pengaturan-harga')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-tags text-amber-400"></i> Acuan Harga
+                    </button>
+                    <button onclick="scrollToSection('kalkulator')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-emerald-300"></i> Kalkulator
+                    </button>
+                    <button onclick="scrollToSection('ringkasan')" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-teal-300"></i> Ringkasan Total
+                    </button>
+                </nav>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-4 py-2.5 rounded-xl shadow-md transition transform active:scale-95 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-print"></i>
+                        <span class="hidden sm:inline">Cetak Laporan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Printable Header Banner (Only visible on Print) -->
+    <div class="print-only p-6 border-b-2 border-slate-800 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">LAPORAN PERHITUNGAN ZAKAT ISLAM</h1>
+                <p class="text-sm text-slate-600">Disusun oleh: <strong>Muhammad Ali Ridho</strong> (IAIN Pontianak)</p>
+                <p class="text-xs text-slate-500 mt-1">Tanggal Cetak: <span id="print-date"></span></p>
+            </div>
+            <div class="text-right">
+                <span class="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-800 rounded border border-emerald-300">Sesuai Syariat Fiqh</span>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- Hero & Context Banner -->
+        <section class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm relative overflow-hidden no-print">
+            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -z-0"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-3 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-book-quran"></i> Panduan Syariah Lengkap
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Hitung Kewajiban Zakat Anda Secara Akurat & Transparent
+                    </h2>
+                    <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                        Aplikasi interaktif untuk menghitung seluruh kategori Zakat (Fitrah, Maal, Emas/Perak, Profesi, Pertanian, Perdagangan, dan Hewan Ternak) lengkap dengan ketentuan Nisab, Haul, dan Kadar Tarif Hukum Islam.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Reference Price Configuration -->
+        <section id="pengaturan-harga" class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm no-print">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-emerald-600"></i> Opsi Harga & Pasar Acuan
+                    </h3>
+                    <p class="text-xs text-slate-500">Sesuaikan harga pasar terkini untuk perhitungan Nisab dan Nominal Zakat Anda.</p>
+                </div>
+                <button onclick="resetDefaultPrices()" class="text-xs text-emerald-700 hover:text-emerald-800 font-semibold underline self-start sm:self-auto">
+                    <i class="fa-solid fa-rotate"></i> Reset ke Harga Default
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Harga Emas -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-emerald-300 transition">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                        <i class="fa-solid fa-coins text-amber-500 mr-1"></i> Harga Emas (per Gram)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400">Rp</span>
+                        <input type="text" inputmode="numeric" autocomplete="off" id="price-gold" value="1.350.000" oninput="calculateAllZakat()" class="w-full pl-9 pr-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Standard Nisab 85 gr = <span id="nisab-gold-val" class="font-semibold text-slate-600">Rp 114.750.000</span></span>
+                </div>
+
+                <!-- Harga Perak -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-emerald-300 transition">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                        <i class="fa-solid fa-ring text-slate-400 mr-1"></i> Harga Perak (per Gram)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400">Rp</span>
+                        <input type="text" inputmode="numeric" autocomplete="off" id="price-silver" value="15.000" oninput="calculateAllZakat()" class="w-full pl-9 pr-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Standard Nisab 595 gr = <span id="nisab-silver-val" class="font-semibold text-slate-600">Rp 8.925.000</span></span>
+                </div>
+
+                <!-- Harga Beras -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-emerald-300 transition">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                        <i class="fa-solid fa-bowl-rice text-amber-600 mr-1"></i> Harga Beras Makanan Pokok (per kg)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400">Rp</span>
+                        <input type="text" inputmode="numeric" autocomplete="off" id="price-rice" value="15.000" oninput="calculateAllZakat()" class="w-full pl-9 pr-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Pertanian 520 kg beras = <span id="nisab-agri-val" class="font-semibold text-slate-600">Rp 7.800.000</span></span>
+                </div>
+
+                <!-- Harga Sapi/Kerbau -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-emerald-300 transition">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                        <i class="fa-solid fa-cow text-amber-700 mr-1"></i> Est. Harga Sapi/Kerbau (per Ekor)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400">Rp</span>
+                        <input type="text" inputmode="numeric" autocomplete="off" id="price-cow" value="18.000.000" oninput="calculateAllZakat()" class="w-full pl-9 pr-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Rata-rata acuan untuk nilai konversi nominal</span>
+                </div>
+
+                <!-- Harga Kambing/Domba -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-emerald-300 transition">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                        <i class="fa-solid fa-disease text-emerald-700 mr-1"></i> Est. Harga Kambing/Domba (per Ekor)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400">Rp</span>
+                        <input type="text" inputmode="numeric" autocomplete="off" id="price-goat" value="3.000.000" oninput="calculateAllZakat()" class="w-full pl-9 pr-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Rata-rata acuan untuk nilai konversi nominal</span>
+                </div>
+
+                <!-- Harga Unta -->
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 hover:border-emerald-300 transition">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">
+                        <i class="fa-solid fa-[#8B4513] fa-hippo mr-1"></i> Est. Harga Unta (per Ekor)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400">Rp</span>
+                        <input type="text" inputmode="numeric" autocomplete="off" id="price-camel" value="35.000.000" oninput="calculateAllZakat()" class="w-full pl-9 pr-3 py-2 text-sm font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <span class="text-[10px] text-slate-400 mt-1 block">Rata-rata acuan untuk nilai konversi nominal</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs for Calculator Modules -->
+        <section id="kalkulator" class="no-print">
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                <button onclick="switchTab('fitrah')" id="tab-fitrah" class="tab-btn px-4 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 whitespace-nowrap transition bg-emerald-600 text-white shadow-md">
+                    <i class="fa-solid fa-wheat-awn"></i> Zakat Fitrah
+                </button>
+                <button onclick="switchTab('maal')" id="tab-maal" class="tab-btn px-4 py-3 rounded-2xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-vault"></i> Zakat Maal/Simpanan
+                </button>
+                <button onclick="switchTab('emas')" id="tab-emas" class="tab-btn px-4 py-3 rounded-2xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-coins text-amber-500"></i> Emas & Perak
+                </button>
+                <button onclick="switchTab('profesi')" id="tab-profesi" class="tab-btn px-4 py-3 rounded-2xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-briefcase"></i> Penghasilan/Profesi
+                </button>
+                <button onclick="switchTab('pertanian')" id="tab-pertanian" class="tab-btn px-4 py-3 rounded-2xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-seedling text-emerald-500"></i> Pertanian
+                </button>
+                <button onclick="switchTab('perdagangan')" id="tab-perdagangan" class="tab-btn px-4 py-3 rounded-2xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-store"></i> Perdagangan
+                </button>
+                <button onclick="switchTab('ternak')" id="tab-ternak" class="tab-btn px-4 py-3 rounded-2xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap transition bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    <i class="fa-solid fa-cow text-amber-700"></i> Hewan Ternak
+                </button>
+            </div>
+        </section>
+
+        <!-- CALCULATOR MODULE PANELS -->
+        <div id="calculator-panels" class="space-y-6">
+
+            <!-- 1. MODULE ZAKAT FITRAH -->
+            <div id="panel-fitrah" class="calc-panel bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Info Header Syariah -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg">
+                            <i class="fa-solid fa-circle-info"></i> Ketentuan Fiqh Zakat Fitrah
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Zakat diri yang wajib dikeluarkan bagi setiap jiwa Muslim sebelum shalat Idul Fitri. 
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Nisab: Ada Kelebihan Makanan</span>
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Haul: Bulan Ramadan</span>
+                        <span class="bg-emerald-600 text-white px-3 py-1 rounded-full font-bold">Kadar: 1 Sha' (2.5 kg / 3.5 Liter)</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Form Input -->
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Input Data Pengeluaran</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Jiwa Tanggungan (Orang)</label>
+                            <input type="number" id="fitrah-people" value="1" min="1" oninput="calculateFitrah()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Standar Makanan Pokok per Jiwa</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                                    <span class="text-xs text-slate-500 block">Aturan Beras (Kg)</span>
+                                    <span class="text-lg font-extrabold text-emerald-700">2.5 Kg</span>
+                                </div>
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                                    <span class="text-xs text-slate-500 block">Aturan Liter</span>
+                                    <span class="text-lg font-extrabold text-teal-700">3.5 Liter</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Result Panel -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">Status & Ringkasan Fitrah</span>
+                            <div class="flex items-center gap-2 text-xl font-bold text-emerald-400">
+                                <i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT FITRAH
+                            </div>
+                        </div>
+                        <div class="space-y-3 py-2 border-y border-slate-800">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Total Beras:</span>
+                                <span class="font-extrabold text-lg text-white" id="fitrah-res-kg">2.5 Kg</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Setara Liter:</span>
+                                <span class="font-bold text-slate-200" id="fitrah-res-liter">3.5 Liter</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-400">Konversi Uang (Beras Rp <span class="fitrah-price-label">15.000</span>/kg):</span>
+                                <span class="font-extrabold text-xl text-amber-400" id="fitrah-res-money">Rp 37.500</span>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-400 italic">
+                            *Dianjurkan mengeluarkan dalam bentuk beras makanan pokok. Pembayaran berupa tunai diperbolehkan menurut mazhab Hanafi dengan nilai konversi harga bahan pokok.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. MODULE ZAKAT MAAL / SIMPANAN -->
+            <div id="panel-maal" class="calc-panel hidden bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Info Header -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg">
+                            <i class="fa-solid fa-circle-info"></i> Ketentuan Fiqh Zakat Maal (Simpanan / Tabungan)
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Zakat harta simpanan seperti tabungan, deposito, giro, investasi saham, emas, serta surat berharga yang telah dimiliki selama 1 tahun (haul).
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Nisab: Setara 85 gr Emas</span>
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Haul: 1 Tahun</span>
+                        <span class="bg-emerald-600 text-white px-3 py-1 rounded-full font-bold">Kadar: 2.5%</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Komponen Harta Simpanan</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Uang Tunai, Tabungan, & Deposito (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="maal-savings" value="100.000.000" min="0" oninput="calculateMaal()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Investasi, Saham, & Reksadana (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="maal-investment" value="20.000.000" min="0" oninput="calculateMaal()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Piutang Lancar yang Diharapkan Cair (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="maal-receivable" value="5.000.000" min="0" oninput="calculateMaal()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1 text-rose-600">Dikurangi: Hutang Jatuh Tempo (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="maal-debt" value="10.000.000" min="0" oninput="calculateMaal()" class="w-full px-4 py-2.5 bg-rose-50/50 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800">
+                        </div>
+                    </div>
+
+                    <!-- Result Card -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">Status Kewajiban Zakat Maal</span>
+                            <div id="maal-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 py-2 border-y border-slate-800 text-xs sm:text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Total Harta Bersih:</span>
+                                <span class="font-bold text-white" id="maal-res-net">Rp 115.000.000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Nisab (85 gr Emas):</span>
+                                <span class="font-bold text-amber-400" id="maal-res-nisab">Rp 114.750.000</span>
+                            </div>
+                            <div class="flex justify-between pt-2 border-t border-slate-800">
+                                <span class="text-slate-300 font-semibold">Besar Zakat (2.5%):</span>
+                                <span class="font-extrabold text-2xl text-emerald-400" id="maal-res-amount">Rp 2.875.000</span>
+                            </div>
+                        </div>
+
+                        <p id="maal-res-note" class="text-[11px] text-slate-400 leading-tight">
+                            Total harta bersih Anda telah melebihi Nisab dan wajib menunaikan Zakat Maal 2.5%.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. MODULE ZAKAT EMAS & PERAK -->
+            <div id="panel-emas" class="calc-panel hidden bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Info Header -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg">
+                            <i class="fa-solid fa-circle-info"></i> Ketentuan Fiqh Zakat Emas & Perak
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Logam mulia emas & perak simpanan atau perhiasan berlebih yang melebihi penggunaan wajar sehari-hari.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Nisab Emas: 85 Gram</span>
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Nisab Perak: 595 Gram</span>
+                        <span class="bg-emerald-600 text-white px-3 py-1 rounded-full font-bold">Kadar: 2.5%</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Kepemilikan Logam Mulia</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">
+                                <i class="fa-solid fa-coins text-amber-500 mr-1"></i> Kepemilikan Emas (Gram)
+                            </label>
+                            <input type="number" id="gold-weight" value="90" min="0" oninput="calculateGoldSilver()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">
+                                <i class="fa-solid fa-ring text-slate-400 mr-1"></i> Kepemilikan Perak (Gram)
+                            </label>
+                            <input type="number" id="silver-weight" value="600" min="0" oninput="calculateGoldSilver()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                    </div>
+
+                    <!-- Result Panel -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">Kalkulasi Emas & Perak</span>
+                            <div id="gold-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT EMAS & PERAK
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 py-2 border-y border-slate-800 text-xs sm:text-sm">
+                            <div class="p-2.5 rounded-xl bg-slate-800/60 space-y-1">
+                                <div class="flex justify-between font-bold">
+                                    <span class="text-amber-400">Zakat Emas:</span>
+                                    <span id="gold-res-weight">2.25 Gram</span>
+                                </div>
+                                <div class="flex justify-between text-xs text-slate-400">
+                                    <span>Setara Rupiah:</span>
+                                    <span class="text-white font-semibold" id="gold-res-money">Rp 3.037.500</span>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 rounded-xl bg-slate-800/60 space-y-1">
+                                <div class="flex justify-between font-bold">
+                                    <span class="text-slate-300">Zakat Perak:</span>
+                                    <span id="silver-res-weight">15.00 Gram</span>
+                                </div>
+                                <div class="flex justify-between text-xs text-slate-400">
+                                    <span>Setara Rupiah:</span>
+                                    <span class="text-white font-semibold" id="silver-res-money">Rp 225.000</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                                <span class="font-bold text-slate-300">Total Nominal Zakat:</span>
+                                <span class="font-extrabold text-2xl text-emerald-400" id="gold-silver-total">Rp 3.262.500</span>
+                            </div>
+                        </div>
+
+                        <p class="text-[11px] text-slate-400 italic">
+                            *Emas & Perak dihitung terpisah berdasarkan nisabnya masing-masing (85 gr Emas & 595 gr Perak).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. MODULE ZAKAT PROFESI / PENGHASILAN -->
+            <div id="panel-profesi" class="calc-panel hidden bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Info Header -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg">
+                            <i class="fa-solid fa-circle-info"></i> Ketentuan Fiqh Zakat Profesi / Penghasilan
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Zakat atas pendapatan rutin per bulan / tahun dari gaji, honorarium, komisi, serta jasa profesional lainnya.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Nisab Bulanan: Setara 85 gr Emas / 12</span>
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Haul: Per Bulan / Per Tahun</span>
+                        <span class="bg-emerald-600 text-white px-3 py-1 rounded-full font-bold">Kadar: 2.5%</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Komponen Penghasilan</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Gaji & Pokok Pendapatan Bulanan (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="profesi-salary" value="12.000.000" min="0" oninput="calculateProfesi()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Bonus, Tunjangan, & Pendapatan Lain (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="profesi-bonus" value="3.000.000" min="0" oninput="calculateProfesi()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1 text-rose-600">Dikurangi: Kebutuhan Pokok Kebutuhan Rutin (Rp) [Opsional]</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="profesi-deduction" value="5.000.000" min="0" oninput="calculateProfesi()" class="w-full px-4 py-2.5 bg-rose-50/50 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800">
+                        </div>
+                    </div>
+
+                    <!-- Result Panel -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">Status Zakat Penghasilan</span>
+                            <div id="profesi-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT PROFESI
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 py-2 border-y border-slate-800 text-xs sm:text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Pendapatan Bersih / Bln:</span>
+                                <span class="font-bold text-white" id="profesi-res-net">Rp 10.000.000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Nisab per Bulan:</span>
+                                <span class="font-bold text-amber-400" id="profesi-res-nisab">Rp 9.562.500</span>
+                            </div>
+                            <div class="flex justify-between pt-2 border-t border-slate-800">
+                                <span class="text-slate-300 font-semibold">Zakat Wajib Bulanan (2.5%):</span>
+                                <span class="font-extrabold text-2xl text-emerald-400" id="profesi-res-monthly">Rp 250.000</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>Setara Zakat Tahunan:</span>
+                                <span class="font-semibold text-slate-200" id="profesi-res-yearly">Rp 3.000.000</span>
+                            </div>
+                        </div>
+
+                        <p class="text-[11px] text-slate-400 italic">
+                            *Nisab profesi dihitung dari setara 85 gr Emas pertahun (~Rp 114.750.000), dibagi 12 bulan = Rp 9.562.500 per bulan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. MODULE ZAKAT PERTANIAN -->
+            <div id="panel-pertanian" class="calc-panel hidden bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Info Header -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg">
+                            <i class="fa-solid fa-circle-info"></i> Ketentuan Fiqh Zakat Pertanian & Perkebunan
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Zakat hasil bumi/tanaman makanan pokok (padi, gandum, jagung, dll) yang dipanen.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Nisab: 5 Wasaq (~520 kg Beras)</span>
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Haul: Setiap Panen</span>
+                        <span class="bg-emerald-600 text-white px-3 py-1 rounded-full font-bold">Kadar: 10% (Hujan) / 5% (Irigasi)</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Hasil Panen & Pengairan</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Total Hasil Panen Beras / Makanan Pokok (Kg)</label>
+                            <input type="number" id="agri-weight" value="1000" min="0" oninput="calculateAgri()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Sistem Pengairan / Irigasi Lahan</label>
+                            <select id="agri-irrigation" onchange="calculateAgri()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                                <option value="0.10">Tadah Hujan / Air Alami (Kadar Zakat 10%)</option>
+                                <option value="0.05">Irigasi Berbayar / Pompa Air / Perawatan (Kadar Zakat 5%)</option>
+                                <option value="0.075">Campuran Hujan & Irigasi Berbayar (Kadar Zakat 7.5%)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Result Panel -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">Status Zakat Pertanian</span>
+                            <div id="agri-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT PERTANIAN
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 py-2 border-y border-slate-800 text-xs sm:text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Total Panen Ditimbang:</span>
+                                <span class="font-bold text-white" id="agri-res-total">1.000 Kg</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Nisab Panen (5 Wasaq):</span>
+                                <span class="font-bold text-amber-400">520 Kg</span>
+                            </div>
+                            <div class="flex justify-between pt-2 border-t border-slate-800">
+                                <span class="text-slate-300 font-semibold">Zakat Wajib (Beras):</span>
+                                <span class="font-extrabold text-2xl text-emerald-400" id="agri-res-kg">100 Kg</span>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-400">
+                                <span>Konversi Nominal Uang:</span>
+                                <span class="font-extrabold text-amber-400 text-base" id="agri-res-money">Rp 1.500.000</span>
+                            </div>
+                        </div>
+
+                        <p class="text-[11px] text-slate-400 italic">
+                            *Kadar zakat ditentukan dari beban biaya pengairan. Dikeluarkan langsung setiap kali mendapatkan hasil panen.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. MODULE ZAKAT PERDAGANGAN -->
+            <div id="panel-perdagangan" class="calc-panel hidden bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Info Header -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg">
+                            <i class="fa-solid fa-circle-info"></i> Ketentuan Fiqh Zakat Perdagangan / Perniagaan
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Zakat dari aktivitas perniagaan/usaha (dihitung dari modal putar + barang dagangan + piutang lancar - hutang jangka pendek).
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Nisab: Setara 85 gr Emas</span>
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Haul: 1 Tahun Usaha</span>
+                        <span class="bg-emerald-600 text-white px-3 py-1 rounded-full font-bold">Kadar: 2.5%</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Komponen Aset Usaha Dagang</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Modal Kas / Kas Usaha Putar (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="trade-cash" value="50.000.000" min="0" oninput="calculateTrade()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Nilai Barang Dagangan / Stok Stok (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="trade-stock" value="80.000.000" min="0" oninput="calculateTrade()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Piutang Dagang Lancar (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="trade-receivables" value="10.000.000" min="0" oninput="calculateTrade()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1 text-rose-600">Dikurangi: Hutang Jatuh Tempo Usaha (Rp)</label>
+                            <input type="text" inputmode="numeric" autocomplete="off" id="trade-debts" value="15.000.000" min="0" oninput="calculateTrade()" class="w-full px-4 py-2.5 bg-rose-50/50 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800">
+                        </div>
+                    </div>
+
+                    <!-- Result Panel -->
+                    <div class="bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                        <div>
+                            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider block mb-1">Status Zakat Perdagangan</span>
+                            <div id="trade-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                <i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT PERDAGANGAN
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 py-2 border-y border-slate-800 text-xs sm:text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Total Harta Bersih Usaha:</span>
+                                <span class="font-bold text-white" id="trade-res-net">Rp 125.000.000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Nisab Dagang (85 gr Emas):</span>
+                                <span class="font-bold text-amber-400" id="trade-res-nisab">Rp 114.750.000</span>
+                            </div>
+                            <div class="flex justify-between pt-2 border-t border-slate-800">
+                                <span class="text-slate-300 font-semibold">Besar Zakat Wajib (2.5%):</span>
+                                <span class="font-extrabold text-2xl text-emerald-400" id="trade-res-amount">Rp 3.125.000</span>
+                            </div>
+                        </div>
+
+                        <p class="text-[11px] text-slate-400 italic">
+                            *Nilai aset dagang dihitung saat tutup buku tahunan (haul).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. MODULE ZAKAT HEWAN TERNAK -->
+            <div id="panel-ternak" class="calc-panel hidden bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 sm:p-8 space-y-8">
+                <!-- Info Header -->
+                <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold text-lg">
+                            <i class="fa-solid fa-circle-info"></i> Ketentuan Fiqh Zakat Hewan Ternak (An'am)
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Hewan ternak yang digembalakan di padang rumput bebas (*Sa'imah*), bukan hewan pekerja sawah/alat angkut, dan telah dimiliki 1 tahun (*haul*).
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Syarat: Sa'imah & Bukan Pekerja</span>
+                        <span class="bg-white border border-emerald-300 text-emerald-800 px-3 py-1 rounded-full font-semibold">Haul: 1 Tahun</span>
+                    </div>
+                </div>
+
+                <!-- Input Sub-Categories -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Sapi / Kerbau -->
+                    <div class="p-5 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-3">
+                        <div class="flex items-center gap-2 text-amber-900 font-bold">
+                            <i class="fa-solid fa-cow text-xl text-amber-700"></i> Sapi / Kerbau
+                        </div>
+                        <span class="text-[11px] text-amber-800 block">Nisab Minimal: <strong>30 Ekor</strong></span>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Sapi / Kerbau (Ekor)</label>
+                            <input type="number" id="livestock-cows" value="35" min="0" oninput="calculateLivestock()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                    </div>
+
+                    <!-- Kambing / Domba -->
+                    <div class="p-5 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 space-y-3">
+                        <div class="flex items-center gap-2 text-emerald-900 font-bold">
+                            <i class="fa-solid fa-disease text-xl text-emerald-700"></i> Kambing / Domba
+                        </div>
+                        <span class="text-[11px] text-emerald-800 block">Nisab Minimal: <strong>40 Ekor</strong></span>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Kambing / Domba (Ekor)</label>
+                            <input type="number" id="livestock-goats" value="50" min="0" oninput="calculateLivestock()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                    </div>
+
+                    <!-- Unta -->
+                    <div class="p-5 rounded-2xl bg-orange-50/50 border border-orange-200/80 space-y-3">
+                        <div class="flex items-center gap-2 text-orange-900 font-bold">
+                            <i class="fa-solid fa-hippo text-xl text-amber-800"></i> Unta
+                        </div>
+                        <span class="text-[11px] text-orange-800 block">Nisab Minimal: <strong>5 Ekor</strong></span>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Unta (Ekor)</label>
+                            <input type="number" id="livestock-camels" value="0" min="0" oninput="calculateLivestock()" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-bold text-slate-800">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hasil Kalkulasi Ternak -->
+                <div class="bg-slate-900 text-white p-6 rounded-2xl space-y-4">
+                    <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Hasil Rincian Kewajiban Zakat Ternak</h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-y border-slate-800 py-4 text-xs sm:text-sm">
+                        <!-- Cow Result -->
+                        <div class="p-3 bg-slate-800/80 rounded-xl space-y-1">
+                            <span class="text-amber-400 font-bold block">1. Sapi / Kerbau:</span>
+                            <div id="cow-result-detail" class="font-semibold text-slate-200">1 ekor Tabi' (Jantan 1 thn)</div>
+                            <div id="cow-result-money" class="text-xs text-amber-300 font-semibold">Est. Rp 18.000.000</div>
+                        </div>
+
+                        <!-- Goat Result -->
+                        <div class="p-3 bg-slate-800/80 rounded-xl space-y-1">
+                            <span class="text-emerald-400 font-bold block">2. Kambing / Domba:</span>
+                            <div id="goat-result-detail" class="font-semibold text-slate-200">1 ekor Kambing (1-2 thn)</div>
+                            <div id="goat-result-money" class="text-xs text-emerald-300 font-semibold">Est. Rp 3.000.000</div>
+                        </div>
+
+                        <!-- Camel Result -->
+                        <div class="p-3 bg-slate-800/80 rounded-xl space-y-1">
+                            <span class="text-orange-400 font-bold block">3. Unta:</span>
+                            <div id="camel-result-detail" class="font-semibold text-slate-200">Belum mencapai nisab (&lt;5)</div>
+                            <div id="camel-result-money" class="text-xs text-orange-300 font-semibold">Rp 0</div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-300">Total Nilai Est. Zakat Ternak:</span>
+                        <span id="livestock-total-money" class="text-2xl font-extrabold text-amber-400">Rp 21.000.000</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Nisab Matrix Table for Livestock Fiqh -->
+                <div class="space-y-4 pt-4 border-t border-slate-200">
+                    <h4 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-table text-emerald-600"></i> Tabel Panduan Matriks Nisab & Kadar Zakat Hewan Ternak
+                    </h4>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
+                        <!-- Table Cow -->
+                        <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                            <div class="bg-amber-100 text-amber-900 font-bold px-4 py-2 border-b border-amber-200">
+                                Matriks Zakat Sapi / Kerbau
+                            </div>
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 font-bold border-b">
+                                    <tr>
+                                        <th class="p-2.5">Jumlah Sapi</th>
+                                        <th class="p-2.5">Kadar Zakat Wajib</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    <tr><td class="p-2 font-semibold">0 - 29 ekor</td><td class="p-2 text-rose-600 font-bold">Bebas Zakat (Belum Nisab)</td></tr>
+                                    <tr class="bg-amber-50/30"><td class="p-2 font-semibold">30 - 39 ekor</td><td class="p-2">1 Ekor Tabi' (Sapi Jantan umur 1 thn)</td></tr>
+                                    <tr><td class="p-2 font-semibold">40 - 59 ekor</td><td class="p-2">1 Ekor Musinnah (Sapi Betina umur 2 thn)</td></tr>
+                                    <tr class="bg-amber-50/30"><td class="p-2 font-semibold">60 - 69 ekor</td><td class="p-2">2 Ekor Tabi'</td></tr>
+                                    <tr><td class="p-2 font-semibold">70 - 79 ekor</td><td class="p-2">1 Ekor Musinnah & 1 Ekor Tabi'</td></tr>
+                                    <tr class="bg-amber-50/30"><td class="p-2 font-semibold">Setiap +30 ekor</td><td class="p-2">+1 Ekor Tabi'</td></tr>
+                                    <tr><td class="p-2 font-semibold">Setiap +40 ekor</td><td class="p-2">+1 Ekor Musinnah</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Table Goat -->
+                        <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                            <div class="bg-emerald-100 text-emerald-900 font-bold px-4 py-2 border-b border-emerald-200">
+                                Matriks Zakat Kambing / Domba
+                            </div>
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 font-bold border-b">
+                                    <tr>
+                                        <th class="p-2.5">Jumlah Kambing</th>
+                                        <th class="p-2.5">Kadar Zakat Wajib</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    <tr><td class="p-2 font-semibold">0 - 39 ekor</td><td class="p-2 text-rose-600 font-bold">Bebas Zakat (Belum Nisab)</td></tr>
+                                    <tr class="bg-emerald-50/30"><td class="p-2 font-semibold">40 - 120 ekor</td><td class="p-2">1 Ekor Kambing/Domba (Umur 1-2 thn)</td></tr>
+                                    <tr><td class="p-2 font-semibold">121 - 200 ekor</td><td class="p-2">2 Ekor Kambing/Domba</td></tr>
+                                    <tr class="bg-emerald-50/30"><td class="p-2 font-semibold">201 - 399 ekor</td><td class="p-2">3 Ekor Kambing/Domba</td></tr>
+                                    <tr><td class="p-2 font-semibold">Setiap Kelipatan 100</td><td class="p-2">+1 Ekor Kambing/Domba Tambahan</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TOTAL SUMMARY & BREAKDOWN CHART -->
+        <section id="ringkasan" class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-emerald-600"></i> Ringkasan Total Akumulasi Zakat
+                    </h3>
+                    <p class="text-xs text-slate-500">Kalkulasi gabungan dari seluruh modul zakat yang wajib Anda tunai.</p>
+                </div>
+                <div class="no-print">
+                    <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf text-amber-400"></i> Cetak Laporan PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Breakdown Table -->
+                <div class="lg:col-span-7 space-y-3">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-200">
+                                    <th class="py-2 font-semibold">Kategori Zakat</th>
+                                    <th class="py-2 font-semibold">Status</th>
+                                    <th class="py-2 font-semibold text-right">Nominal Wajib</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 font-medium text-slate-700">
+                                <tr>
+                                    <td class="py-3 flex items-center gap-2"><i class="fa-solid fa-wheat-awn text-emerald-600"></i> Zakat Fitrah</td>
+                                    <td class="py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span></td>
+                                    <td class="py-3 text-right font-bold text-slate-900" id="summary-fitrah">Rp 37.500</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 flex items-center gap-2"><i class="fa-solid fa-vault text-blue-600"></i> Zakat Maal/Simpanan</td>
+                                    <td class="py-3" id="status-summary-maal"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span></td>
+                                    <td class="py-3 text-right font-bold text-slate-900" id="summary-maal">Rp 2.875.000</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 flex items-center gap-2"><i class="fa-solid fa-coins text-amber-500"></i> Zakat Emas & Perak</td>
+                                    <td class="py-3" id="status-summary-gold"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span></td>
+                                    <td class="py-3 text-right font-bold text-slate-900" id="summary-emas">Rp 3.262.500</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 flex items-center gap-2"><i class="fa-solid fa-briefcase text-indigo-600"></i> Zakat Profesi</td>
+                                    <td class="py-3" id="status-summary-profesi"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span></td>
+                                    <td class="py-3 text-right font-bold text-slate-900" id="summary-profesi">Rp 250.000</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 flex items-center gap-2"><i class="fa-solid fa-seedling text-emerald-500"></i> Zakat Pertanian</td>
+                                    <td class="py-3" id="status-summary-agri"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span></td>
+                                    <td class="py-3 text-right font-bold text-slate-900" id="summary-pertanian">Rp 1.500.000</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 flex items-center gap-2"><i class="fa-solid fa-store text-teal-600"></i> Zakat Perdagangan</td>
+                                    <td class="py-3" id="status-summary-trade"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span></td>
+                                    <td class="py-3 text-right font-bold text-slate-900" id="summary-perdagangan">Rp 3.125.000</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 flex items-center gap-2"><i class="fa-solid fa-cow text-amber-700"></i> Zakat Hewan Ternak</td>
+                                    <td class="py-3" id="status-summary-livestock"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span></td>
+                                    <td class="py-3 text-right font-bold text-slate-900" id="summary-ternak">Rp 21.000.000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-4 bg-emerald-900 text-white rounded-2xl flex items-center justify-between shadow-md">
+                        <div>
+                            <span class="text-xs text-emerald-300 block uppercase font-bold tracking-wider">Total Seluruh Zakat Terakumulasi</span>
+                            <span class="text-xs text-slate-300">Siap Ditunaikan Kepada Amil / Mustahik</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-amber-400" id="grand-total-zakat">
+                            Rp 32.050.000
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Chart Breakdown -->
+                <div class="lg:col-span-5 flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200/60 rounded-2xl no-print">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Proporsi Distribusi Kewajiban Zakat</h4>
+                    <div class="w-full max-w-[280px]">
+                        <canvas id="zakatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 mt-12 py-8 text-center text-xs">
+        <div class="max-w-7xl mx-auto px-4 space-y-3">
+            <div class="flex items-center justify-center gap-2 text-white font-bold text-sm">
+                <i class="fa-solid fa-kaaba text-amber-400"></i> Kalkulator Zakat Islam Syariah
+            </div>
+            <p class="max-w-md mx-auto text-slate-400">
+                Aplikasi ini dikembangkan sebagai media edukasi dan pemungutan kalkulasi zakat yang transparan sesuai acuan Fiqh Islam.
+            </p>
+            <div class="pt-3 border-t border-slate-800 text-slate-500">
+                Disusun oleh: <strong class="text-amber-400">Muhammad Ali Ridho</strong> &bull; Institut Agama Islam Negeri (IAIN) Pontianak
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic & Calculations -->
+    <script>
+        // Global Chart variable
+        let zakatChartInstance = null;
+
+        // On DOM Loaded Init
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set Print Date
+            const today = new Date();
+            document.getElementById('print-date').innerText = today.toLocaleDateString('id-ID', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            // Set up Indonesian thousands separators for nominal inputs
+            setupNominalInputs();
+
+            // Initialize calculations
+            calculateAllZakat();
+            initChart();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tabKey) {
+            // Hide all panels
+            document.querySelectorAll('.calc-panel').forEach(panel => panel.classList.add('hidden'));
+            
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-600', 'text-white', 'shadow-md');
+                btn.classList.add('bg-white', 'text-slate-600', 'hover:bg-slate-100', 'border', 'border-slate-200');
+            });
+
+            // Show selected panel
+            const activePanel = document.getElementById(`panel-${tabKey}`);
+            if (activePanel) activePanel.classList.remove('hidden');
+
+            // Activate tab button
+            const activeTab = document.getElementById(`tab-${tabKey}`);
+            if (activeTab) {
+                activeTab.classList.remove('bg-white', 'text-slate-600', 'hover:bg-slate-100', 'border', 'border-slate-200');
+                activeTab.classList.add('bg-emerald-600', 'text-white', 'shadow-md');
+            }
+        }
+
+        // Parse nominal rupiah with Indonesian thousands separators (e.g. 12.000.000).
+        function parseNominal(id) {
+            const raw = document.getElementById(id).value || '0';
+            return Number(String(raw).replace(/\./g, '').replace(/[^0-9-]/g, '')) || 0;
+        }
+
+        function formatNominalInput(input) {
+            const digits = String(input.value || '').replace(/\./g, '').replace(/[^0-9]/g, '');
+            input.value = digits ? Number(digits).toLocaleString('id-ID') : '';
+        }
+
+        function setupNominalInputs() {
+            const ids = ['price-gold', 'price-silver', 'price-rice', 'price-cow', 'price-goat', 'price-camel', 'maal-savings', 'maal-investment', 'maal-receivable', 'maal-debt', 'profesi-salary', 'profesi-bonus', 'profesi-deduction', 'trade-cash', 'trade-stock', 'trade-receivables', 'trade-debts'];
+            ids.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input) return;
+                input.addEventListener('blur', () => formatNominalInput(input));
+                input.addEventListener('focus', () => { input.value = input.value.replace(/\./g, ''); });
+            });
+        }
+
+        // Helper: Format Rupiah
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(number);
+        }
+
+        // Smooth scroll to element
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Reset Prices to default
+        function resetDefaultPrices() {
+            document.getElementById('price-gold').value = '1.350.000' ;
+            document.getElementById('price-silver').value = '15.000' ;
+            document.getElementById('price-rice').value = '15.000' ;
+            document.getElementById('price-cow').value = '18.000.000' ;
+            document.getElementById('price-goat').value = '3.000.000' ;
+            document.getElementById('price-camel').value = '35.000.000' ;
+            calculateAllZakat();
+        }
+
+        // Master Calculation Function
+        function calculateAllZakat() {
+            // Get Benchmark Prices
+            const goldPrice = parseNominal('price-gold') || 0;
+            const silverPrice = parseNominal('price-silver') || 0;
+            const ricePrice = parseNominal('price-rice') || 0;
+
+            // Update Nisab Labels in Settings
+            document.getElementById('nisab-gold-val').innerText = formatRupiah(goldPrice * 85);
+            document.getElementById('nisab-silver-val').innerText = formatRupiah(silverPrice * 595);
+            document.getElementById('nisab-agri-val').innerText = formatRupiah(ricePrice * 520);
+            document.querySelectorAll('.fitrah-price-label').forEach(el => el.innerText = ricePrice.toLocaleString('id-ID'));
+
+            // Calculate Sub-modules
+            const fitrahVal = calculateFitrah();
+            const maalVal = calculateMaal();
+            const goldSilverVal = calculateGoldSilver();
+            const profesiVal = calculateProfesi();
+            const agriVal = calculateAgri();
+            const tradeVal = calculateTrade();
+            const livestockVal = calculateLivestock();
+
+            // Calculate Grand Total
+            const grandTotal = fitrahVal + maalVal + goldSilverVal + profesiVal + agriVal + tradeVal + livestockVal;
+            document.getElementById('grand-total-zakat').innerText = formatRupiah(grandTotal);
+
+            // Update Breakdown Chart
+            updateChart([fitrahVal, maalVal, goldSilverVal, profesiVal, agriVal, tradeVal, livestockVal]);
+        }
+
+        // 1. Zakat Fitrah
+        function calculateFitrah() {
+            const people = parseInt(document.getElementById('fitrah-people').value) || 0;
+            const ricePrice = parseNominal('price-rice') || 0;
+
+            const totalKg = people * 2.5;
+            const totalLiter = people * 3.5;
+            const totalMoney = totalKg * ricePrice;
+
+            document.getElementById('fitrah-res-kg').innerText = `${totalKg.toLocaleString('id-ID')} Kg`;
+            document.getElementById('fitrah-res-liter').innerText = `${totalLiter.toLocaleString('id-ID')} Liter`;
+            document.getElementById('fitrah-res-money').innerText = formatRupiah(totalMoney);
+            document.getElementById('summary-fitrah').innerText = formatRupiah(totalMoney);
+
+            return totalMoney;
+        }
+
+        // 2. Zakat Maal / Simpanan
+        function calculateMaal() {
+            const savings = parseNominal('maal-savings') || 0;
+            const investment = parseNominal('maal-investment') || 0;
+            const receivable = parseNominal('maal-receivable') || 0;
+            const debt = parseNominal('maal-debt') || 0;
+
+            const goldPrice = parseNominal('price-gold') || 0;
+            const nisabMaal = 85 * goldPrice;
+
+            const netAsset = Math.max(0, (savings + investment + receivable) - debt);
+            const isWajib = netAsset >= nisabMaal && netAsset > 0;
+            const zakatAmount = isWajib ? netAsset * 0.025 : 0;
+
+            document.getElementById('maal-res-net').innerText = formatRupiah(netAsset);
+            document.getElementById('maal-res-nisab').innerText = formatRupiah(nisabMaal);
+            document.getElementById('maal-res-amount').innerText = formatRupiah(zakatAmount);
+            document.getElementById('summary-maal').innerText = formatRupiah(zakatAmount);
+
+            // Status Badge
+            const badge = document.getElementById('maal-status-badge');
+            const summaryStatus = document.getElementById('status-summary-maal');
+            if (isWajib) {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT MAAL`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span>`;
+            } else {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM WAJIB ZAKAT (Di Bawah Nisab)`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">Belum Nisab</span>`;
+            }
+
+            return zakatAmount;
+        }
+
+        // 3. Zakat Emas & Perak
+        function calculateGoldSilver() {
+            const goldGram = parseFloat(document.getElementById('gold-weight').value) || 0;
+            const silverGram = parseFloat(document.getElementById('silver-weight').value) || 0;
+
+            const goldPrice = parseNominal('price-gold') || 0;
+            const silverPrice = parseNominal('price-silver') || 0;
+
+            const isGoldWajib = goldGram >= 85;
+            const goldZakatGram = isGoldWajib ? goldGram * 0.025 : 0;
+            const goldZakatMoney = goldZakatGram * goldPrice;
+
+            const isSilverWajib = silverGram >= 595;
+            const silverZakatGram = isSilverWajib ? silverGram * 0.025 : 0;
+            const silverZakatMoney = silverZakatGram * silverPrice;
+
+            const totalMoney = goldZakatMoney + silverZakatMoney;
+
+            document.getElementById('gold-res-weight').innerText = isGoldWajib ? `${goldZakatGram.toFixed(2)} Gram` : "0 Gram (Belum Nisab)";
+            document.getElementById('gold-res-money').innerText = formatRupiah(goldZakatMoney);
+
+            document.getElementById('silver-res-weight').innerText = isSilverWajib ? `${silverZakatGram.toFixed(2)} Gram` : "0 Gram (Belum Nisab)";
+            document.getElementById('silver-res-money').innerText = formatRupiah(silverZakatMoney);
+
+            document.getElementById('gold-silver-total').innerText = formatRupiah(totalMoney);
+            document.getElementById('summary-emas').innerText = formatRupiah(totalMoney);
+
+            // Status Badge
+            const badge = document.getElementById('gold-status-badge');
+            const summaryStatus = document.getElementById('status-summary-gold');
+            if (isGoldWajib || isSilverWajib) {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT LOGAM MULIA`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span>`;
+            } else {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM WAJIB ZAKAT (Emas &lt; 85g, Perak &lt; 595g)`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">Belum Nisab</span>`;
+            }
+
+            return totalMoney;
+        }
+
+        // 4. Zakat Profesi
+        function calculateProfesi() {
+            const salary = parseNominal('profesi-salary') || 0;
+            const bonus = parseNominal('profesi-bonus') || 0;
+            const deduction = parseNominal('profesi-deduction') || 0;
+
+            const goldPrice = parseNominal('price-gold') || 0;
+            const monthlyNisab = (85 * goldPrice) / 12;
+
+            const monthlyNet = Math.max(0, (salary + bonus) - deduction);
+            const isWajib = monthlyNet >= monthlyNisab;
+            const monthlyZakat = isWajib ? monthlyNet * 0.025 : 0;
+            const yearlyZakat = monthlyZakat * 12;
+
+            document.getElementById('profesi-res-net').innerText = formatRupiah(monthlyNet);
+            document.getElementById('profesi-res-nisab').innerText = formatRupiah(monthlyNisab);
+            document.getElementById('profesi-res-monthly').innerText = formatRupiah(monthlyZakat);
+            document.getElementById('profesi-res-yearly').innerText = formatRupiah(yearlyZakat);
+            document.getElementById('summary-profesi').innerText = formatRupiah(monthlyZakat);
+
+            // Status Badge
+            const badge = document.getElementById('profesi-status-badge');
+            const summaryStatus = document.getElementById('status-summary-profesi');
+            if (isWajib) {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT PROFESI`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span>`;
+            } else {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM WAJIB ZAKAT PROFESI`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">Belum Nisab</span>`;
+            }
+
+            return monthlyZakat;
+        }
+
+        // 5. Zakat Pertanian
+        function calculateAgri() {
+            const weight = parseFloat(document.getElementById('agri-weight').value) || 0;
+            const rate = parseFloat(document.getElementById('agri-irrigation').value) || 0.10;
+            const ricePrice = parseNominal('price-rice') || 0;
+
+            const isWajib = weight >= 520;
+            const zakatKg = isWajib ? weight * rate : 0;
+            const zakatMoney = zakatKg * ricePrice;
+
+            document.getElementById('agri-res-total').innerText = `${weight.toLocaleString('id-ID')} Kg`;
+            document.getElementById('agri-res-kg').innerText = isWajib ? `${zakatKg.toLocaleString('id-ID')} Kg` : "0 Kg";
+            document.getElementById('agri-res-money').innerText = formatRupiah(zakatMoney);
+            document.getElementById('summary-pertanian').innerText = formatRupiah(zakatMoney);
+
+            // Status Badge
+            const badge = document.getElementById('agri-status-badge');
+            const summaryStatus = document.getElementById('status-summary-agri');
+            if (isWajib) {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT PERTANIAN`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span>`;
+            } else {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM WAJIB ZAKAT (&lt; 520 Kg)`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">Belum Nisab</span>`;
+            }
+
+            return zakatMoney;
+        }
+
+        // 6. Zakat Perdagangan
+        function calculateTrade() {
+            const cash = parseNominal('trade-cash') || 0;
+            const stock = parseNominal('trade-stock') || 0;
+            const receivables = parseNominal('trade-receivables') || 0;
+            const debts = parseNominal('trade-debts') || 0;
+
+            const goldPrice = parseNominal('price-gold') || 0;
+            const nisabTrade = 85 * goldPrice;
+
+            const netTrade = Math.max(0, (cash + stock + receivables) - debts);
+            const isWajib = netTrade >= nisabTrade;
+            const zakatTrade = isWajib ? netTrade * 0.025 : 0;
+
+            document.getElementById('trade-res-net').innerText = formatRupiah(netTrade);
+            document.getElementById('trade-res-nisab').innerText = formatRupiah(nisabTrade);
+            document.getElementById('trade-res-amount').innerText = formatRupiah(zakatTrade);
+            document.getElementById('summary-perdagangan').innerText = formatRupiah(zakatTrade);
+
+            // Status Badge
+            const badge = document.getElementById('trade-status-badge');
+            const summaryStatus = document.getElementById('status-summary-trade');
+            if (isWajib) {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> WAJIB ZAKAT PERDAGANGAN`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span>`;
+            } else {
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> BELUM WAJIB ZAKAT PERDAGANGAN`;
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">Belum Nisab</span>`;
+            }
+
+            return zakatTrade;
+        }
+
+        // 7. Zakat Hewan Ternak (Cow, Goat, Camel)
+        function calculateLivestock() {
+            const cows = parseInt(document.getElementById('livestock-cows').value) || 0;
+            const goats = parseInt(document.getElementById('livestock-goats').value) || 0;
+            const camels = parseInt(document.getElementById('livestock-camels').value) || 0;
+
+            const cowPrice = parseNominal('price-cow') || 0;
+            const goatPrice = parseNominal('price-goat') || 0;
+            const camelPrice = parseNominal('price-camel') || 0;
+
+            // 1. Sapi Calculation (Rule: every 30 = 1 Tabi', every 40 = 1 Musinnah)
+            let cowDetail = "Bebas Zakat (<30 ekor)";
+            let cowMoney = 0;
+            if (cows >= 30) {
+                let tabi = 0;
+                let musinnah = 0;
+                
+                // Tiered solver for cow zakat
+                let rem = cows;
+                // Simple best-fit combination for standard herds
+                if (cows >= 30 && cows < 40) { tabi = 1; }
+                else if (cows >= 40 && cows < 60) { musinnah = 1; }
+                else if (cows >= 60 && cows < 70) { tabi = 2; }
+                else if (cows >= 70 && cows < 80) { tabi = 1; musinnah = 1; }
+                else if (cows >= 80 && cows < 90) { musinnah = 2; }
+                else if (cows >= 90 && cows < 100) { tabi = 3; }
+                else {
+                    musinnah = Math.floor(cows / 40);
+                    let remCow = cows % 40;
+                    tabi = Math.floor(remCow / 30);
+                }
+
+                let desc = [];
+                if (tabi > 0) desc.push(`${tabi} Tabi' (Sapi Jantan 1 thn)`);
+                if (musinnah > 0) desc.push(`${musinnah} Musinnah (Sapi Betina 2 thn)`);
+                cowDetail = desc.join(" + ");
+                cowMoney = (tabi * cowPrice * 0.8) + (musinnah * cowPrice); // Musinnah higher value
+            }
+
+            // 2. Kambing Calculation (Rule: 40-120=1, 121-200=2, 201-399=3, 400+=+1 per 100)
+            let goatDetail = "Bebas Zakat (<40 ekor)";
+            let goatCount = 0;
+            if (goats >= 40 && goats <= 120) goatCount = 1;
+            else if (goats >= 121 && goats <= 200) goatCount = 2;
+            else if (goats >= 201 && goats <= 399) goatCount = 3;
+            else if (goats >= 400) goatCount = 4 + Math.floor((goats - 400) / 100);
+
+            if (goatCount > 0) {
+                goatDetail = `${goatCount} ekor Kambing/Domba (Umur 1-2 thn)`;
+            }
+            let goatMoney = goatCount * goatPrice;
+
+            // 3. Unta Calculation (5-9=1 goat, 10-14=2 goats, 15-19=3 goats, 20-24=4 goats, 25+=Bint Makhad)
+            let camelDetail = "Bebas Zakat (<5 ekor)";
+            let camelMoney = 0;
+            if (camels >= 5 && camels <= 9) {
+                camelDetail = "1 ekor Kambing";
+                camelMoney = goatPrice;
+            } else if (camels >= 10 && camels <= 14) {
+                camelDetail = "2 ekor Kambing";
+                camelMoney = 2 * goatPrice;
+            } else if (camels >= 15 && camels <= 19) {
+                camelDetail = "3 ekor Kambing";
+                camelMoney = 3 * goatPrice;
+            } else if (camels >= 20 && camels <= 24) {
+                camelDetail = "4 ekor Kambing";
+                camelMoney = 4 * goatPrice;
+            } else if (camels >= 25) {
+                let untaBetina = Math.floor(camels / 25);
+                camelDetail = `${untaBetina} ekor Unta Betina (Bint Makhad)`;
+                camelMoney = untaBetina * camelPrice;
+            }
+
+            // Update UI
+            document.getElementById('cow-result-detail').innerText = cowDetail;
+            document.getElementById('cow-result-money').innerText = formatRupiah(cowMoney);
+
+            document.getElementById('goat-result-detail').innerText = goatDetail;
+            document.getElementById('goat-result-money').innerText = formatRupiah(goatMoney);
+
+            document.getElementById('camel-result-detail').innerText = camelDetail;
+            document.getElementById('camel-result-money').innerText = formatRupiah(camelMoney);
+
+            const totalLivestockMoney = cowMoney + goatMoney + camelMoney;
+            document.getElementById('livestock-total-money').innerText = formatRupiah(totalLivestockMoney);
+            document.getElementById('summary-ternak').innerText = formatRupiah(totalLivestockMoney);
+
+            // Status Summary
+            const isAnyLivestockWajib = cows >= 30 || goats >= 40 || camels >= 5;
+            const summaryStatus = document.getElementById('status-summary-livestock');
+            if (isAnyLivestockWajib) {
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Wajib</span>`;
+            } else {
+                summaryStatus.innerHTML = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">Belum Nisab</span>`;
+            }
+
+            return totalLivestockMoney;
+        }
+
+        // Initialize Breakdown Donut Chart using Chart.js
+        function initChart() {
+            const ctx = document.getElementById('zakatChart').getContext('2d');
+            zakatChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fitrah', 'Maal', 'Emas/Perak', 'Profesi', 'Pertanian', 'Perdagangan', 'Ternak'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            '#10b981', // Fitrah
+                            '#2563eb', // Maal
+                            '#f59e0b', // Emas
+                            '#6366f1', // Profesi
+                            '#059669', // Pertanian
+                            '#0d9488', // Perdagangan
+                            '#b45309'  // Ternak
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 10, family: 'Inter' },
+                                boxWidth: 12
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        // Update Chart values
+        function updateChart(dataArray) {
+            if (zakatChartInstance) {
+                zakatChartInstance.data.datasets[0].data = dataArray;
+                zakatChartInstance.update();
+            }
+        }
+    </script>
+</body>
+</html>

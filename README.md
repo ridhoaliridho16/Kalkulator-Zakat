@@ -1,2 +1,0 @@
-# Kalkulator-Zakat
-Perhitungan Zakat
